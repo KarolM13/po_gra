@@ -1,8 +1,8 @@
 import pygame
-from game import game
+from game import Game
 
 def main():
-    game()
-
+    g = Game()
+    g.game()
 if __name__ == "__main__":
     main()
