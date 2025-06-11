@@ -13,5 +13,11 @@ class Screen:
     def update(self):
         pygame.display.flip()
         self.clock.tick(60)
+    def draw_hud(self, player):
+        font = pygame.font.Font(None, 36)
+        health_text = font.render(f"Health: {player.health}/{player.max_health}", True, (255, 255, 255))
+        level_text = font.render(f"Level: {player.level}", True, (255, 255, 255))
+        self.surface.blit(health_text, (10, 10))
+        self.surface.blit(level_text, (10, 40))
         
         

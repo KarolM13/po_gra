@@ -25,6 +25,7 @@ class Game:
                 # Rysuj wszystko
                 self.screen.surface.blit(self.screen.game_map, (0, 0))
                 self.enemy.draw(self.screen)
+                self.screen.draw_hud(self.player)
                 self.player.draw(self.screen)
                 if self.player.get_rect().colliderect(self.enemy.get_rect()):
                      print("Collision detected!")
