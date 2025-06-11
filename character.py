@@ -1,12 +1,9 @@
 import pygame
-
 class Character:
-    def __init__(self , x ,y = 0, max_health = 100, speed = 5, size = 50 , damage = 10, range = 100, sprite_path = None):
+    def __init__(self , x ,y = 0,delta_time=0, max_health = 100, speed = 5, size = 50 , damage = 10, range = 100, sprite_path = None):
        
         self.x = x
-        self.y = y
-
-       
+        self.y = y       
         self.max_health = max_health
         self.health = max_health
         self.speed = speed
@@ -33,7 +30,7 @@ class Character:
         screen.surface.blit(self.sprite, (self.x, self.y))
 
     def move(self):
-        self.x += self.direction_x * self.speed
+        self.x += self.direction_x * self.speed 
         self.y += self.direction_y * self.speed
 
     def die(self):
