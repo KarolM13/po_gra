@@ -8,4 +8,3 @@ class Screen:
         self.game_map = pygame.transform.scale(pygame.image.load("./assets/background.png"), (self._width, self._height))
         self.clock = pygame.time.Clock()
         self.fps = 60
-        self.running = True
