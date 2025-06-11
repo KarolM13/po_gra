@@ -1,12 +1,14 @@
 import pygame
 from screen import Screen
 from player import Player
+from enemy import Enemy
 class Game:
     def __init__(self):
         pygame.init()
         self.screen = Screen()
         self.player = Player(100, 100) 
         self.running = True 
+        self.enemy = Enemy(300,300)
     def game(self):
         while self.running:
                 for event in pygame.event.get():
@@ -19,8 +21,13 @@ class Game:
                 
                 # Aktualizuj gracza
                 self.player.update()
-                
+                self.enemy.patrol(self.player)
                 # Rysuj wszystko
                 self.screen.surface.blit(self.screen.game_map, (0, 0))
+                self.enemy.draw(self.screen)
                 self.player.draw(self.screen)
+                if self.player.get_rect().colliderect(self.enemy.get_rect()):
+                     print("Collision detected!")
+            
+                
                 self.screen.update()
