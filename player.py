@@ -1,2 +1,5 @@
-print("test player.py")
-print("TEST TEST")
+import pygame 
+
+class Player:
+    def __init__(self):
+        
