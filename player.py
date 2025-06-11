@@ -2,7 +2,7 @@ import pygame
 from character import Character
 class Player(Character):
     def __init__(self , x ,y):
-        super().__init__(x, y , max_health=100, speed=5, size=25 , sprite_path="./assets/player.png")
+        super().__init__(x, y , max_health=100, speed=5, size=25 , sprite_path="./assets/ziutek.png")
         self.experience = 0
         self.level = 1
     def input(self):
