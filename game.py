@@ -31,11 +31,10 @@ class Game:
                     self.player.update()
                     self.enemy.patrol(self.player)
 
-                    current_time = pygame.time.get_ticks()
-                    if self.player.get_rect().colliderect(self.enemy.get_rect()) and current_time > self.immunity_time:
+
+                    if self.player.get_rect().colliderect(self.enemy.get_rect()):
                         print("Collision detected!")
-                        self.player.take_damage(self.enemy.damage)
-                        self.immunity_time = pygame.time.get_ticks() + 1000
+                        self.enemy.attack(self.player)
 
                     if self.player.health <= 0:
                         self.game_over = True

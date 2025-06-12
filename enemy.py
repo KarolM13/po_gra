@@ -7,6 +7,7 @@ class Enemy(Character):
         self.patrol_points = []
         self.current_patrol_index = 0
         self.directnion = 0
+        self.last_attack_time = pygame.time.get_ticks()
 
     def patrol(self,player):
         dx = player.x - self.x
@@ -17,4 +18,10 @@ class Enemy(Character):
         self.x += dx * self.speed
         self.y += dy * self.speed
 
-    
+    def attack(self, player):
+        cooldown = 10
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_attack_time >= cooldown:
+            player.take_damage(self.damage)
+            self.last_attack_time = current_time
+            print(f"Enemy attacked player for {self.damage} damage. Player health: {player.health}/{player.max_health}")
