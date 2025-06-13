@@ -4,7 +4,8 @@ from wand import Wand
 class Player(Character):
     def __init__(self , x ,y):
         super().__init__(x, y , max_health=100, speed=10, size=100 , sprite_path="./assets/ziutek.png")
-        self.experience = 0
+        self.xp = 0
+        self.xp_to_next_level = 100
         self.level = 1
         self.weapons = []
         self.flip = pygame.transform.flip(self.sprite, True, False)
@@ -38,4 +39,3 @@ class Player(Character):
         self.input()
         for weapon in self.weapons:
             weapon.update(enemies)
-    
