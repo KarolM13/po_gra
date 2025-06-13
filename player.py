@@ -1,13 +1,21 @@
 import pygame 
 from character import Character
+from wand import Wand
 class Player(Character):
     def __init__(self , x ,y):
         super().__init__(x, y , max_health=100, speed=10, size=100 , sprite_path="./assets/ziutek.png")
         self.experience = 0
         self.level = 1
+        self.weapons = []
         self.flip = pygame.transform.flip(self.sprite, True, False)
         self.img_back =pygame.transform.scale(pygame.image.load("./assets/ziutek_tyl.png"), (self.size, self.size))
         self.img_front = pygame.transform.scale(pygame.image.load("./assets/ziutek_przod.png"), (self.size, self.size))
+        self.equip_weapon(Wand())
+
+    def equip_weapon(self, weapon):
+        weapon.assign_owner(self)
+        self.weapons.append(weapon)
+
     def input(self):
         keys = pygame.key.get_pressed()
         self.direction_x = 0
@@ -26,6 +34,8 @@ class Player(Character):
             self.sprite = pygame.transform.flip(self.flip, True, False)
         self.x += self.direction_x * self.speed 
         self.y += self.direction_y * self.speed
-    def update(self):
-        self.input()    
+    def update(self , enemies=[]):
+        self.input()
+        for weapon in self.weapons:
+            weapon.update(enemies)
     

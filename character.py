@@ -32,7 +32,7 @@ class Character:
     def die(self):
         self.alive = False
         self.health = 0
-        print("Character has died.")
+
         
     def take_damage(self, amount):
         self.health -= amount
