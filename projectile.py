@@ -12,7 +12,7 @@ class Projectile:
         self.range = range
         self.distance_traveled = 0
         self.sprite = None
-        self.size = 20
+        self.size = 50
 
         # Ładowanie sprite'a pocisku
         if sprite_path:
