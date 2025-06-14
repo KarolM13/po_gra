@@ -17,6 +17,27 @@ class Player(Character):
         weapon.assign_owner(self)
         self.weapons.append(weapon)
 
+    def add_xp(self, amount,screen):
+        self.xp += amount
+        if self.xp >= self.xp_to_next_level:
+            self.xp -= self.xp_to_next_level
+            self.level_up(screen)
+
+    def level_up(self,screen):
+        self.level += 1
+        self.xp_to_next_level = int(self.xp_to_next_level * 1.5)
+        # Przykładowe menu ulepszeń
+        upgrades = [
+            {"name": "Zdrowie", "description": "Zwiększ maksymalne zdrowie o 20"},
+            {"name": "Obrażenia", "description": "Zwiększ obrażenia o 5"},
+            {"name": "Szybkość", "description": "Zwiększ szybkość ruchu o 2"}
+        ]
+        screen.draw_level_up_menu(upgrades)
+        print(f"Level up! Teraz poziom {self.level}. XP do następnego poziomu: {self.xp_to_next_level}")
+
+    def get_xp_percentage(self):
+        return (self.xp / self.xp_to_next_level) * 100 if self.xp_to_next_level > 0 else 0
+
     def input(self):
         keys = pygame.key.get_pressed()
         self.direction_x = 0

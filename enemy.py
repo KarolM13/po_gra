@@ -9,14 +9,27 @@ class Enemy(Character):
         self.directnion = 0
         self.last_attack_time = pygame.time.get_ticks()
 
-    def patrol(self,player):
+    def patrol(self, player, all_enemies=None):
+        # Oblicz kierunek do gracza
         dx = player.x - self.x
         dy = player.y - self.y
         distance = (dx**2 + dy**2)**0.5
+        if distance == 0:
+            return
         dx /= distance
         dy /= distance
-        self.x += dx * self.speed
-        self.y += dy * self.speed
+        # Proponowana nowa pozycja
+        new_x = self.x + dx * self.speed
+        new_y = self.y + dy * self.speed
+        new_rect = pygame.Rect(new_x, new_y, self.size, self.size)
+        # Sprawdź kolizję z innymi wrogami
+        if all_enemies:
+            for enemy in all_enemies:
+                if enemy is not self and new_rect.colliderect(enemy.get_rect()):
+                    return  # kolizja, nie ruszaj się
+        # Jeśli nie ma kolizji, zaktualizuj pozycję
+        self.x = new_x
+        self.y = new_y
 
     def attack(self, player):
         cooldown = 10
