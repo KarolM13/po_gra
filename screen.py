@@ -51,7 +51,7 @@ class Screen:
         pygame.display.update()
         # Zerowanie czasu po pokazaniu game over
         self.start_ticks = pygame.time.get_ticks()
-    def draw_level_up_menu(self, upgrades, selected_idx=None):
+    def draw_level_up_menu(self, upgrades, selected_idx=None, player=None):
         # Pobierz rozmiar ekranu i przygotuj główny box menu
         screen_rect = self.surface.get_rect()
         width = 400
@@ -65,6 +65,17 @@ class Screen:
         title_text = font.render("LEVEL UP!", True, (255, 255, 255))
         tittle_rect = title_text.get_rect(center=(screen_rect.centerx, screen_rect.top + 60))
         self.surface.blit(title_text, tittle_rect)
+        # Statystyki gracza po lewej stronie
+        if player is not None:
+            stat_font = pygame.font.Font(None, 28)
+            stats = [
+                f"HP: {player.health}/{player.max_health}",
+                f"DMG: {getattr(player, 'damage', '?')}",
+                f"Speed: {player.speed}"
+            ]
+            for i, stat in enumerate(stats):
+                stat_text = stat_font.render(stat, True, (255, 255, 255))
+                self.surface.blit(stat_text, (box_rect.left - 180, box_rect.top + 40 + i * 40))
         # Czcionka do przycisków
         font_small = pygame.font.Font(None, 21)
         self.button_rects = []  # lista prostokątów przycisków do obsługi kliknięć

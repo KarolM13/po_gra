@@ -85,7 +85,8 @@ class Game:
                 if selected_upgrade is None:
                     selected_upgrade = 0
                 self.screen.surface.blit(self.screen.game_map, (0, 0))
-                self.screen.draw_level_up_menu(self.level_up_upgrades, selected_idx=selected_upgrade)
+                # Przekazujemy player do draw_level_up_menu, żeby wyświetlić statystyki
+                self.screen.draw_level_up_menu(self.level_up_upgrades, selected_idx=selected_upgrade, player=self.player)
                 pygame.display.flip()
                 continue
 
@@ -156,8 +157,9 @@ class Game:
             self.player.max_health += 20
             self.player.health += 20
         elif upgrade["name"] == "Obrażenia":
+            self.player.damage += 5  # Zwiększ DMG gracza (do statystyk)
             for w in self.player.weapons:
-                w.damage += 5
+                w.damage += 5  # Zwiększ DMG broni
         elif upgrade["name"] == "Szybkość":
             self.player.speed += 2
         self.level_up_pending = False
