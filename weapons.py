@@ -73,7 +73,7 @@ class Weapon:
             direction_x, direction_y = 1, 0  # domyślny kierunek, jeśli dystans jest zerowy
 
 
-        num_projectiles = self.level
+        num_projectiles = 1
 
         for i in range(num_projectiles):
 

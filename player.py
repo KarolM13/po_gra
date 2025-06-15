@@ -1,6 +1,8 @@
 import pygame 
 from character import Character
+from magicBook import MagicBook
 from wand import Wand
+from iceWand import IceWand
 class Player(Character):
     def __init__(self , x ,y):
         super().__init__(x, y , max_health=100, speed=10, size=100 , sprite_path="./assets/ziutek.png")
@@ -11,9 +13,21 @@ class Player(Character):
         self.flip = pygame.transform.flip(self.sprite, True, False)
         self.img_back =pygame.transform.scale(pygame.image.load("./assets/ziutek_tyl.png"), (self.size, self.size))
         self.img_front = pygame.transform.scale(pygame.image.load("./assets/ziutek_przod.png"), (self.size, self.size))
-        self.equip_weapon(Wand())
+        self.equip_weapon(IceWand())
+        self.weapon_choice_pending = False
 
     def equip_weapon(self, weapon):
+        print("Próba dodania broni:", weapon.name)
+        for w in self.weapons:
+            print("Porównuję z:", w.name)
+            if w.name == weapon.name:
+                print("Znaleziono, ulepszam poziom!")
+                w.level += 1
+                w.damage += 5
+                w.attack_speed = max(w.attack_speed - 100, 100)
+                print(self.weapons)
+                return
+        print("Dodaję nową broń:", weapon.name)
         weapon.assign_owner(self)
         self.weapons.append(weapon)
 
@@ -34,6 +48,9 @@ class Player(Character):
         ]
         screen.draw_level_up_menu(upgrades)
         print(f"Level up! Teraz poziom {self.level}. XP do następnego poziomu: {self.xp_to_next_level}")
+        if self.level % 5 == 0:
+            self.weapon_choice_pending = True
+
 
     def get_xp_percentage(self):
         return (self.xp / self.xp_to_next_level) * 100 if self.xp_to_next_level > 0 else 0

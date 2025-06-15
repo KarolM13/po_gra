@@ -6,8 +6,8 @@ class Screen:
         {"name": "Runetracer", "description": "Passes through enemies, bounces around."},
         {"name": "Whip", "description": "Attacks horizontally, passes through enemies."},
         {"name": "Lightning Ring", "description": "Strikes at random enemies."}]   
-        self._width = 1280
-        self._height = 720
+        self._width = 1980
+        self._height = 1080
         self.surface = pygame.display.set_mode((self._width, self._height))
         self.game_map = pygame.transform.scale(pygame.image.load("./assets/background.png"), (self._width, self._height))
         self.clock = pygame.time.Clock()

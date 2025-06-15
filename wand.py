@@ -4,8 +4,8 @@ from weapons import Weapon
 class Wand(Weapon):
     def __init__(self):
         super().__init__(
-            name="Magiczna Różdżka",
-            damage=15,
+            name="Wand",
+            damage=111,
             projectile_speed=7,
             attack_speed=220,
             range=350,
