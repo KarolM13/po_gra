@@ -13,7 +13,7 @@ class Player(Character):
         self.flip = pygame.transform.flip(self.sprite, True, False)
         self.img_back =pygame.transform.scale(pygame.image.load("./assets/ziutek_tyl.png"), (self.size, self.size))
         self.img_front = pygame.transform.scale(pygame.image.load("./assets/ziutek_przod.png"), (self.size, self.size))
-        self.equip_weapon(IceWand())
+        self.equip_weapon(Wand())
         self.weapon_choice_pending = False
 
     def equip_weapon(self, weapon):
@@ -73,6 +73,10 @@ class Player(Character):
             self.sprite = pygame.transform.flip(self.flip, True, False)
         self.x += self.direction_x * self.speed 
         self.y += self.direction_y * self.speed
+        screen_width = 1980
+        screen_height = 1080
+        self.x = max(0, min(self.x, screen_width - self.size))
+        self.y = max(0, min(self.y, screen_height - self.size))
     def update(self , enemies=[]):
         self.input()
         for weapon in self.weapons:

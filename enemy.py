@@ -1,6 +1,8 @@
 import pygame
 from character import Character
 from player import Player
+from projectile import Projectile
+import math
 class Enemy(Character):
     def __init__(self, x, y=0, delta_time=0, max_health=100, speed=3, size=100, damage=10, range=100, sprite_path="assets/vampire.png"):
         super().__init__(x, y, delta_time, max_health, speed, size, damage, range, sprite_path)
@@ -59,13 +61,70 @@ class Enemy(Character):
             self.last_attack_time = current_time
             print(f"Enemy attacked player for {self.damage} damage. Player health: {player.health}/{player.max_health}")
 class TankEnemy(Enemy):
-    def __init__(self, x ,y):
-        super().__init__(x, y , speed = 5 ,size=300, max_health = 200 , damage = 20, sprite_path="./assets/wojfer.png")
+    def __init__(self, x, y, difficulty_level=0):
+        hp = 200 + 40 * difficulty_level
+        dmg = 20 + 4 * difficulty_level
+        speed = 5 + 0.5 * difficulty_level
+        super().__init__(x, y, speed=speed, max_health=hp, damage=dmg, sprite_path="./assets/zombie.png")
 
 class FastEnemy(Enemy):
-    def __init__(self, x ,y):
-        super().__init__(x, y , speed = 10 , max_health = 30 , damage = 5, sprite_path="./assets/vampire.png")
+    def __init__(self, x, y, difficulty_level=0):
+        hp = 30 + 10 * difficulty_level
+        dmg = 5 + 2 * difficulty_level
+        speed = 10 + 1 * difficulty_level
+        super().__init__(x, y, speed=speed, max_health=hp, damage=dmg, sprite_path="./assets/vampire.png")
 
 class NormalEnemy(Enemy):
-    def __init__(self, x ,y):
-        super().__init__(x, y , speed = 5 ,size=200, max_health = 200 , damage = 20, sprite_path="./assets/tusk.png")
+    def __init__(self, x, y, difficulty_level=0):
+        hp = 100 + 20 * difficulty_level
+        dmg = 10 + 2 * difficulty_level
+        speed = 5 + 0.5 * difficulty_level
+        super().__init__(x, y, sprite_path="./assets/tusk.png")
+class BossEnemy(Enemy):
+    def __init__(self, x, y):
+        super().__init__(x, y, speed=3, size=400, max_health=1500, damage=50, sprite_path="./assets/wojfer.png")
+
+class ShooterEnemy(Enemy):
+    def __init__(self, x, y, difficulty_level=0):
+        super().__init__(x, y, speed=4, max_health=80, damage=10, sprite_path="./assets/shooter.png")
+        self.projectiles = []
+        self.shoot_cooldown = 1500  # ms
+        self.last_shot_time = pygame.time.get_ticks()
+
+    def update(self, player):
+        self.patrol(player)
+        now = pygame.time.get_ticks()
+        if now - self.last_shot_time > self.shoot_cooldown:
+            self.shoot(player)
+            self.last_shot_time = now
+        # Aktualizuj pociski
+        for proj in self.projectiles[:]:
+            if not proj.update():
+                self.projectiles.remove(proj)
+
+    def shoot(self, player):
+        dx = player.x + player.size // 2 - (self.x + self.size // 2)
+        dy = player.y + player.size // 2 - (self.y + self.size // 2)
+        dist = math.hypot(dx, dy)
+        if dist == 0:
+            return
+        dir_x = dx / dist
+        dir_y = dy / dist
+        proj = Projectile(
+            self.x + self.size // 2,
+            self.y + self.size // 2,
+            dir_x, dir_y,
+            speed=7,
+            damage=self.damage,
+            range=600,
+            sprite_path="./assets/arrow.png"
+        )
+        if proj.sprite:
+            angle = math.degrees(math.atan2(-dir_y, dir_x))
+            proj.sprite = pygame.transform.rotate(proj.sprite, angle)
+        self.projectiles.append(proj)
+
+    def draw(self, screen):
+        super().draw(screen)
+        for proj in self.projectiles:
+            proj.draw(screen)

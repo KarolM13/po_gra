@@ -17,26 +17,63 @@ class Screen:
         self.gameover_background = pygame.transform.scale(pygame.image.load("./assets/gameover_background.png"), (self._width, self._height))
         self.menu_music_path = "./assets/menu_start.mp3"
         self.gameover_music_path = "./assets/game_over.mp3"
+        self.victory_background = pygame.transform.scale(
+            pygame.image.load("./assets/victory.png"), (self._width, self._height)
+        )
     def update(self):
         pygame.display.flip()
         self.clock.tick(60)
+
     def draw_hud(self, player):
-        font = pygame.font.Font(None, 36)
-        health_text = font.render(f"Health: {player.health}/{player.max_health}", True, (255, 255, 255))
+        font = pygame.font.Font(None, 28)
+        offset_x = 50
+        offset_y = 40
+
+        # Pasek HP
+        bar_width = 300
+        bar_height = 30
+        hp_ratio = player.health / player.max_health if player.max_health > 0 else 0
+        hp_bar_rect = pygame.Rect(10 + offset_x, 10 + offset_y, bar_width, bar_height)
+        pygame.draw.rect(self.surface, (60, 60, 60), hp_bar_rect)  # tło
+        pygame.draw.rect(self.surface, (200, 0, 0),
+                         (10 + offset_x, 10 + offset_y, int(bar_width * hp_ratio), bar_height))  # pasek HP
+        hp_text = font.render(f"HP: {player.health}/{player.max_health}", True, (255, 255, 255))
+        self.surface.blit(hp_text, (15 + offset_x, 15 + offset_y))
+
+        # Pasek XP
+        xp_bar_rect = pygame.Rect(10 + offset_x, 50 + offset_y, bar_width, bar_height)
+        xp_ratio = player.xp / player.xp_to_next_level if player.xp_to_next_level > 0 else 0
+        pygame.draw.rect(self.surface, (60, 60, 60), xp_bar_rect)  # tło
+        pygame.draw.rect(self.surface, (0, 120, 255),
+                         (10 + offset_x, 50 + offset_y, int(bar_width * xp_ratio), bar_height))  # pasek XP
+        xp_text = font.render(f"XP: {player.xp}/{player.xp_to_next_level}", True, (255, 255, 255))
+        self.surface.blit(xp_text, (15 + offset_x, 55 + offset_y))
+
+        # Poziom gracza
         level_text = font.render(f"Level: {player.level}", True, (255, 255, 255))
-        self.surface.blit(health_text, (10, 10))
-        self.surface.blit(level_text, (10, 40))
-        # XP HUD - bez warunku, zawsze wyświetlaj
-        xp_text = font.render(f"XP: {player.xp} / {player.xp_to_next_level}", True, (255, 255, 255))
-        self.surface.blit(xp_text, (10, 70))
-        # Liczenie czasu od startu gry
+        self.surface.blit(level_text, (10 + offset_x, 90 + offset_y))
+
+        # Timer
         total_seconds = (pygame.time.get_ticks() - self.start_ticks) // 1000
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         timer_text = font.render(f"Czas: {minutes:02}:{seconds:02}", True, (0, 0, 0))
-        # Wyśrodkowanie na górze
-        timer_rect = timer_text.get_rect(center=(self._width // 2, 20))
+        timer_rect = timer_text.get_rect(center=(self._width // 2, 20 + offset_y))
         self.surface.blit(timer_text, timer_rect)
+
+
+
+    def draw_boss_hp_bar(self, boss):
+        bar_width = 800
+        bar_height = 40
+        x = (self._width - bar_width) // 2
+        y = self._height - bar_height - 30  # 30 px od dołu
+        hp_ratio = boss.health / boss.max_health if boss.max_health > 0 else 0
+        pygame.draw.rect(self.surface, (60, 60, 60), (x, y, bar_width, bar_height))  # tło
+        pygame.draw.rect(self.surface, (200, 0, 0), (x, y, int(bar_width * hp_ratio), bar_height))  # pasek HP
+        font = pygame.font.Font(None, 36)
+        hp_text = font.render(f"BOSS HP: {int(boss.health)}/{boss.max_health}", True, (255, 255, 255))
+        self.surface.blit(hp_text, (x + 20, y + 5))
 
     def show_game_over(self):  
         if not hasattr(self, "_gameover_music_played") or not self._gameover_music_played:
@@ -109,13 +146,19 @@ class Screen:
             upgrade_text = font_small.render(f"{i + 1}. {upgrade['name']}: {upgrade['description']}", True, (255, 255, 255))
             upgrade_rect = upgrade_text.get_rect(center=button_rect.center)
             self.surface.blit(upgrade_text, upgrade_rect)
+
+    def show_victory(self):
+        self.surface.blit(self.victory_background, (0, 0))
+        pygame.display.update()
+        pygame.time.wait(5000)
+
     def draw_start_menu(self):
         pygame.mixer.music.load(self.menu_music_path)
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0.1)
         self.surface.blit(self.menu_background, (0, 0))
         font = pygame.font.Font(None, 74)
-        title_text = font.render('VAMPIRE SURVIVORS', True, (255, 0, 0))
+        title_text = font.render('BURATO SURVIVORS', True, (255, 0, 0))
         title_rect = title_text.get_rect(center=(self.surface.get_width() // 2, self.surface.get_height() // 2 - 300))
 
         font_small = pygame.font.Font(None, 36)

@@ -2,7 +2,7 @@ import pygame
 import random
 from screen import Screen
 from player import Player
-from enemy import Enemy, TankEnemy, FastEnemy, NormalEnemy
+from enemy import Enemy, TankEnemy, FastEnemy, NormalEnemy, BossEnemy, ShooterEnemy
 from wand import Wand
 from iceWand import IceWand
 from magicBook import MagicBook
@@ -32,6 +32,10 @@ class Game:
         self.enemiesdied = 0
         self.random_choices = [1,2,3,4,5,6,7,8,9,10]
         self.gamemusic_path = "./assets/game_music.mp3"
+        self.boss_spawned = False
+        self.boss_defeated = False
+        self.difficulty_level = 0
+        self.last_difficulty_increase = pygame.time.get_ticks()
 
     def spawn_enemy(self, count=1):
         for _ in range(count):
@@ -48,8 +52,8 @@ class Game:
             else:
                 x = -100
                 y = random.randint(0, self.screen._height)
-            enemy_type = random.choice([TankEnemy, FastEnemy , NormalEnemy, FastEnemy , NormalEnemy, FastEnemy , NormalEnemy, FastEnemy , NormalEnemy  ])
-            self.enemies.append(enemy_type(x, y))
+            enemy_type = random.choice([TankEnemy, FastEnemy , NormalEnemy,ShooterEnemy,ShooterEnemy,ShooterEnemy,FastEnemy , NormalEnemy, FastEnemy , NormalEnemy, FastEnemy , NormalEnemy  ])
+            self.enemies.append(enemy_type(x, y , self.difficulty_level))
 
     def game(self):
         selected_upgrade = None
@@ -59,7 +63,7 @@ class Game:
         while waiting:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return
+                    return False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         waiting = False
@@ -70,12 +74,21 @@ class Game:
         while self.running:
             elapsed_minutes = (pygame.time.get_ticks() - self.start_time) // 60000
             self.max_enemies = 10 + 5 * elapsed_minutes  # co 1 minuta +5 wrogów
+            if not self.boss_spawned and elapsed_minutes >= 1:
+                print("Spawnuje bossa!")
+                boss = BossEnemy(1000, 500)  # przykładowe współrzędne
+
+                self.enemies.append(boss)
+                self.boss_spawned = True
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                    return False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
+                        return False
                     elif event.key == pygame.K_r and self.game_over:
                         self.load_music()
                         self.player = Player(100, 100)
@@ -133,7 +146,8 @@ class Game:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             self.running = False
-                            choosing = False
+                            return False
+
                         elif event.type == pygame.KEYDOWN:
                             if event.key in [pygame.K_1, pygame.K_KP1]:
                                 selected_weapon = 0
@@ -164,6 +178,14 @@ class Game:
                 continue
 
             if not self.game_over:
+                # Co 30 sekund zwiększ poziom trudności
+                if pygame.time.get_ticks() - self.last_difficulty_increase > 30000:
+                    self.difficulty_level += 1
+                    min_cooldown = 500
+                    base_cooldown = 3000
+                    cooldown_factor = 0.9 ** self.difficulty_level  # 10% mniej co poziom trudności
+                    self.enemy_spawn_cooldown = max(int(base_cooldown * cooldown_factor), min_cooldown)
+                    self.last_difficulty_increase = pygame.time.get_ticks()
                 current_time = pygame.time.get_ticks()
                 if current_time - self.last_enemy_spawn_time >= self.enemy_spawn_cooldown and len(self.enemies) < self.max_enemies:
                     enemies_to_spawn = min(3, self.max_enemies - len(self.enemies))
@@ -172,12 +194,41 @@ class Game:
 
                 self.player.update(self.enemies)
 
+
+                if self.boss_spawned and not self.boss_defeated:
+                    for enemy in self.enemies:
+                        if isinstance(enemy, BossEnemy) and enemy.health <= 0:
+                            self.boss_defeated = True
+                            self.screen.show_victory()
+                            self.game_overtxt()
+                            self.screen.draw_start_menu()
+                            waiting = True
+                            while waiting:
+                                for event in pygame.event.get():
+                                    if event.type == pygame.QUIT:
+                                        self.running = False
+                                        return False
+                                        waiting = False
+                                    elif event.type == pygame.KEYDOWN:
+                                        if event.key == pygame.K_RETURN:
+                                            waiting = False
+                            # Restart gry
+                            self.__init__()
+                            self.load_music()
+                            break
                 new_enemies = []
                 for enemy in self.enemies:
                     if enemy.alive:
-                        enemy.patrol(self.player, self.enemies)
+                        if isinstance(enemy, ShooterEnemy):
+                            enemy.update(self.player)
+                            # Sprawdź kolizje pocisków z graczem
+                            for proj in enemy.projectiles[:]:
+                                if self.player.get_rect().colliderect(proj.get_rect()):
+                                    self.player.take_damage(proj.damage)
+                                    enemy.projectiles.remove(proj)
+                        else:
+                            enemy.patrol(self.player, self.enemies)
                         if self.player.get_rect().colliderect(enemy.get_rect()):
-                            print("Collision detected!")
                             enemy.attack(self.player)
                         new_enemies.append(enemy)
                     else:
@@ -186,9 +237,14 @@ class Game:
                         if random.choice(self.random_choices) == 3:
                             self.potions.append(HealthPotion(enemy.x, enemy.y, value=20))
                         else:
-                            xp_value = 11202
+                            base_xp = 100
                             if isinstance(enemy, TankEnemy):
-                                xp_value = 11502
+                                base_xp = 150
+                            elif isinstance(enemy, FastEnemy):
+                                base_xp = 80
+                            elif isinstance(enemy, NormalEnemy):
+                                base_xp = 120
+                            xp_value = int(base_xp * (1 + 0.2 * self.difficulty_level))
                             self.xp_drops.append(XP(enemy.x, enemy.y, value=xp_value))
                 self.enemies = new_enemies
 
@@ -208,7 +264,7 @@ class Game:
                     if self.player.get_rect().colliderect(xp_drop.get_rect()):
                         self.player.xp += xp_drop.value
 
-                        if self.player.xp >= self.player.xp_to_next_level:
+                        while self.player.xp >= self.player.xp_to_next_level:
                             self.player.xp -= self.player.xp_to_next_level
                             self.player.level += 1
                             self.player.xp_to_next_level = int(self.player.xp_to_next_level * 1.5)
@@ -232,7 +288,10 @@ class Game:
 
                 for weapon in self.player.weapons:
                     weapon.draw(self.screen)
-
+                for enemy in self.enemies:
+                    if isinstance(enemy, BossEnemy) and enemy.alive:
+                        self.screen.draw_boss_hp_bar(enemy)
+                        break
                 self.screen.draw_hud(self.player)
                 self.player.draw(self.screen)
                 self.screen.update()
@@ -256,7 +315,10 @@ class Game:
         pygame.mixer.music.set_volume(0.1)
     def game_overtxt(self):
         with open("game_over.txt", "a") as f:
-            f.write("Game Over\n")
+            if self.boss_defeated == True:
+                f.write("You won the game!\n")
+            else:
+                f.write("Game Over\n")
             f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n")
             f.write(f"Final Time: {(pygame.time.get_ticks() - self.start_time) // 1000} seconds\n")
             f.write(f"Final Level: {self.player.level}\n")
@@ -265,6 +327,4 @@ class Game:
             f.write(f"Final Damage: {self.player.damage}\n")
             f.write(f"Final Speed: {self.player.speed}\n")
             f.write(f"Enemies defeated: {self.enemiesdied}\n")
-            for enemy in self.enemies:
-                if not enemy.alive:
-                    f.write(f"{enemy.__class__.__name__} at ({enemy.x}, {enemy.y})\n")
+            f.write("=========================\n")
