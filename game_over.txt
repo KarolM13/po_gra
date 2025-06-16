@@ -1,0 +1,26 @@
+Game Over
+Date: 2025-06-16 21:42:53
+Final Level: 1
+Final XP: 0
+Final Health: 0/100
+Final Damage: 10
+Final Speed: 10
+Enemies defeated:
+Game Over
+Date: 2025-06-16 21:44
+Final Time: 6 seconds
+Final Level: 1
+Final XP: 0
+Final Health: 0/100
+Final Damage: 10
+Final Speed: 10
+Enemies defeated:
+Game Over
+Date: 2025-06-16 21:45
+Final Time: 8 seconds
+Final Level: 2
+Final XP: 11102
+Final Health: 0/120
+Final Damage: 10
+Final Speed: 10
+Enemies defeated: 2

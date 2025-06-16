@@ -13,7 +13,10 @@ class Screen:
         self.clock = pygame.time.Clock()
         self.delta_time = self.clock.tick(60) / 1000.0 
         self.start_ticks = pygame.time.get_ticks()
-        
+        self.menu_background = pygame.transform.scale(pygame.image.load("./assets/menu_background.png"), (self._width, self._height))
+        self.gameover_background = pygame.transform.scale(pygame.image.load("./assets/gameover_background.png"), (self._width, self._height))
+        self.menu_music_path = "./assets/menu_start.mp3"
+        self.gameover_music_path = "./assets/game_over.mp3"
     def update(self):
         pygame.display.flip()
         self.clock.tick(60)
@@ -35,8 +38,13 @@ class Screen:
         timer_rect = timer_text.get_rect(center=(self._width // 2, 20))
         self.surface.blit(timer_text, timer_rect)
 
-    def show_game_over(self):
-        self.surface.fill((0, 0, 0))
+    def show_game_over(self):  
+        if not hasattr(self, "_gameover_music_played") or not self._gameover_music_played:
+            pygame.mixer.music.load(self.gameover_music_path)
+            pygame.mixer.music.play()
+            self._gameover_music_played = True
+
+        self.surface.blit(self.gameover_background, (0, 0))
         font = pygame.font.Font(None, 74)
         text = font.render('GAME OVER', True, (255, 0, 0))
         text_rect = text.get_rect(center=(self.surface.get_width() // 2, self.surface.get_height() // 2))
@@ -101,3 +109,21 @@ class Screen:
             upgrade_text = font_small.render(f"{i + 1}. {upgrade['name']}: {upgrade['description']}", True, (255, 255, 255))
             upgrade_rect = upgrade_text.get_rect(center=button_rect.center)
             self.surface.blit(upgrade_text, upgrade_rect)
+    def draw_start_menu(self):
+        pygame.mixer.music.load(self.menu_music_path)
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.1)
+        self.surface.blit(self.menu_background, (0, 0))
+        font = pygame.font.Font(None, 74)
+        title_text = font.render('VAMPIRE SURVIVORS', True, (255, 0, 0))
+        title_rect = title_text.get_rect(center=(self.surface.get_width() // 2, self.surface.get_height() // 2 - 300))
+
+        font_small = pygame.font.Font(None, 36)
+        start_text = font_small.render('Naciśnij ENTER aby rozpocząć', True, (255, 255, 255))
+        start_rect = start_text.get_rect(center=(self.surface.get_width() // 2,
+                                                  self.surface.get_height() // 2 + 60))
+
+        self.surface.blit(title_text, title_rect)
+        self.surface.blit(start_text, start_rect)
+        pygame.display.update()
+    

@@ -9,6 +9,7 @@ from magicBook import MagicBook
 from character import Character
 from xp import XP
 from healthpotion import HealthPotion
+from datetime import datetime   
 
 
 class Game:
@@ -16,7 +17,7 @@ class Game:
         pygame.init()
         self.screen = Screen()
         self.player = Player(100, 100)
-        self.running = True
+        self.running = False
         self.enemies = []
         self.start_time = pygame.time.get_ticks()
         self.immunity_time = 0
@@ -28,7 +29,9 @@ class Game:
         self.potions = []
         self.level_up_pending = False
         self.level_up_upgrades = []
+        self.enemiesdied = 0
         self.random_choices = [1,2,3,4,5,6,7,8,9,10]
+        self.gamemusic_path = "./assets/game_music.mp3"
 
     def spawn_enemy(self, count=1):
         for _ in range(count):
@@ -50,7 +53,20 @@ class Game:
 
     def game(self):
         selected_upgrade = None
-
+        # Wyświetl ekran startowy i czekaj na ENTER
+        self.screen.draw_start_menu()
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        waiting = False
+            self.screen.clock.tick(60)
+        self.load_music()
+        
+        self.running = True
         while self.running:
             elapsed_minutes = (pygame.time.get_ticks() - self.start_time) // 60000
             self.max_enemies = 10 + 5 * elapsed_minutes  # co 1 minuta +5 wrogów
@@ -61,6 +77,7 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                     elif event.key == pygame.K_r and self.game_over:
+                        self.load_music()
                         self.player = Player(100, 100)
                         self.enemies = [Enemy(300, 300)]
                         self.xp_drops.clear()
@@ -165,6 +182,7 @@ class Game:
                         new_enemies.append(enemy)
                     else:
                         print(f"Enemy died")
+                        self.enemiesdied += 1
                         if random.choice(self.random_choices) == 3:
                             self.potions.append(HealthPotion(enemy.x, enemy.y, value=20))
                         else:
@@ -176,10 +194,13 @@ class Game:
 
                 if self.player.health <= 0:
                     self.game_over = True
+                    self.screen._gameover_music_played = False
+                    self.game_overtxt()
 
             if self.game_over:
                 self.screen.show_game_over()
                 self.xp_drops.clear()
+                continue
             else:
                 self.screen.surface.blit(self.screen.game_map, (0, 0))
                 for xp_drop in self.xp_drops[:]:
@@ -229,3 +250,21 @@ class Game:
             self.player.speed += 2
         self.level_up_pending = False
         self.level_up_upgrades = []
+    def load_music(self):
+        pygame.mixer.music.load(self.gamemusic_path)
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.1)
+    def game_overtxt(self):
+        with open("game_over.txt", "a") as f:
+            f.write("Game Over\n")
+            f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n")
+            f.write(f"Final Time: {(pygame.time.get_ticks() - self.start_time) // 1000} seconds\n")
+            f.write(f"Final Level: {self.player.level}\n")
+            f.write(f"Final XP: {self.player.xp}\n")
+            f.write(f"Final Health: {self.player.health}/{self.player.max_health}\n")
+            f.write(f"Final Damage: {self.player.damage}\n")
+            f.write(f"Final Speed: {self.player.speed}\n")
+            f.write(f"Enemies defeated: {self.enemiesdied}\n")
+            for enemy in self.enemies:
+                if not enemy.alive:
+                    f.write(f"{enemy.__class__.__name__} at ({enemy.x}, {enemy.y})\n")
