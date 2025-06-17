@@ -79,7 +79,7 @@ class NormalEnemy(Enemy):
         hp = 100 + 20 * difficulty_level
         dmg = 10 + 2 * difficulty_level
         speed = 5 + 0.5 * difficulty_level
-        super().__init__(x, y, sprite_path="./assets/tusk.png")
+        super().__init__(x, y, sprite_path="./assets/bat.png")
 class BossEnemy(Enemy):
     def __init__(self, x, y):
         super().__init__(x, y, speed=3, size=400, max_health=1500, damage=50, sprite_path="./assets/wojfer.png")

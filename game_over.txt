@@ -149,3 +149,43 @@ Final Damage: 30
 Final Speed: 12
 Enemies defeated: 49
 =========================
+You won the game!
+Date: 2025-06-17 01:09
+Final Time: 70 seconds
+Final Level: 8
+Final XP: 343
+Final Health: 240/240
+Final Damage: 10
+Final Speed: 10
+Enemies defeated: 61
+=========================
+You won the game!
+Date: 2025-06-17 01:43
+Final Time: 67 seconds
+Final Level: 8
+Final XP: 1355
+Final Health: 160/160
+Final Damage: 30
+Final Speed: 10
+Enemies defeated: 55
+=========================
+You won the game!
+Date: 2025-06-17 13:05
+Final Time: 73 seconds
+Final Level: 8
+Final XP: 1011
+Final Health: 182/200
+Final Damage: 15
+Final Speed: 12
+Enemies defeated: 63
+=========================
+Game Over
+Date: 2025-06-17 13:13
+Final Time: 28 seconds
+Final Level: 5
+Final XP: 248
+Final Health: 0/100
+Final Damage: 10
+Final Speed: 18
+Enemies defeated: 20
+=========================

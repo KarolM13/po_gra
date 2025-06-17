@@ -67,6 +67,11 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         waiting = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if hasattr(self.screen, "menu_x_rect") and self.screen.menu_x_rect.collidepoint(mouse_pos):
+                        pygame.quit()
+                        return False
             self.screen.clock.tick(60)
         self.load_music()
         
@@ -312,7 +317,7 @@ class Game:
     def load_music(self):
         pygame.mixer.music.load(self.gamemusic_path)
         pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.set_volume(0.01)
     def game_overtxt(self):
         with open("game_over.txt", "a") as f:
             if self.boss_defeated == True:

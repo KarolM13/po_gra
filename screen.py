@@ -155,7 +155,7 @@ class Screen:
     def draw_start_menu(self):
         pygame.mixer.music.load(self.menu_music_path)
         pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.set_volume(0.02)
         self.surface.blit(self.menu_background, (0, 0))
         font = pygame.font.Font(None, 74)
         title_text = font.render('BURATO SURVIVORS', True, (255, 0, 0))
@@ -166,7 +166,17 @@ class Screen:
         start_rect = start_text.get_rect(center=(self.surface.get_width() // 2,
                                                   self.surface.get_height() // 2 + 60))
 
+        # Rysowanie dużego czerwonego X w prawym górnym rogu
+        x_size = 80
+        x_margin = 30
+        x_rect = pygame.Rect(self._width - x_size - x_margin, x_margin, x_size, x_size)
+        pygame.draw.rect(self.surface, (200, 0, 0), x_rect, border_radius=18)
+        x_font = pygame.font.Font(None, 90)
+        x_text = x_font.render('X', True, (255, 255, 255))
+        x_text_rect = x_text.get_rect(center=x_rect.center)
+        self.surface.blit(x_text, x_text_rect)
+        self.menu_x_rect = x_rect  # zapisz do obsługi kliknięcia
+
         self.surface.blit(title_text, title_rect)
         self.surface.blit(start_text, start_rect)
         pygame.display.update()
-    
