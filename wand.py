@@ -2,7 +2,9 @@ import pygame
 from weapons import Weapon
 
 class Wand(Weapon):
+    """Podstawowa broń gracza wystrzeliwująca pociski."""
     def __init__(self):
+        """Inicjalizuje różdżkę z domyślnymi parametrami."""
         super().__init__(
             name="Wand",
             damage=111,
@@ -14,6 +16,7 @@ class Wand(Weapon):
 
         self.sprite = None
         self.size = 40
+        # Wczytaj grafikę różdżki
         try:
             self.sprite = pygame.image.load("assets/magic wand.png")
             self.sprite = pygame.transform.scale(self.sprite, (self.size, self.size))
@@ -22,6 +25,7 @@ class Wand(Weapon):
             self.sprite = None
 
     def draw(self, screen):
+        """Rysuje wszystkie pociski wystrzelone przez różdżkę."""
         for projectile in self.projectiles:
             projectile.draw(screen)
 

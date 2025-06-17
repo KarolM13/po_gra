@@ -2,6 +2,7 @@ import pygame
 from game import Game
 
 def main():
+    """Główna pętla gry. Restartuje grę po zakończeniu, dopóki użytkownik nie wyjdzie."""
     while True:
         g = Game()
         should_continue = g.game()

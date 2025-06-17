@@ -1,5 +1,3 @@
-import pygame
-import random
 from screen import Screen
 from player import Player
 from enemy import Enemy, TankEnemy, FastEnemy, NormalEnemy, BossEnemy, ShooterEnemy
@@ -10,10 +8,13 @@ from character import Character
 from xp import XP
 from healthpotion import HealthPotion
 from datetime import datetime   
-
+import pygame
+import random
 
 class Game:
+    """Główna klasa gry, zarządza logiką, stanem i pętlą gry."""
     def __init__(self):
+        """Inicjalizuje grę, ustawia początkowe wartości i ładuje zasoby."""
         pygame.init()
         self.screen = Screen()
         self.player = Player(100, 100)
@@ -38,6 +39,7 @@ class Game:
         self.last_difficulty_increase = pygame.time.get_ticks()
 
     def spawn_enemy(self, count=1):
+        """Losowo generuje i dodaje nowych przeciwników na planszy."""
         for _ in range(count):
             side = random.randint(0, 3)
             if side == 0:
@@ -56,6 +58,7 @@ class Game:
             self.enemies.append(enemy_type(x, y , self.difficulty_level))
 
     def game(self):
+        """Główna pętla gry, obsługuje logikę, zdarzenia i rysowanie ekranu."""
         selected_upgrade = None
         # Wyświetl ekran startowy i czekaj na ENTER
         self.screen.draw_start_menu()
@@ -302,6 +305,7 @@ class Game:
                 self.screen.update()
 
     def apply_upgrade(self, idx):
+        """Zwiększa statystyki gracza po wybraniu ulepszenia."""
         upgrade = self.level_up_upgrades[idx]
         if upgrade["name"] == "Zdrowie":
             self.player.max_health += 20
@@ -315,10 +319,12 @@ class Game:
         self.level_up_pending = False
         self.level_up_upgrades = []
     def load_music(self):
+        """Ładuje i odtwarza muzykę w tle gry."""
         pygame.mixer.music.load(self.gamemusic_path)
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0.01)
     def game_overtxt(self):
+        """Zapisuje podsumowanie gry do pliku tekstowego."""
         with open("game_over.txt", "a") as f:
             if self.boss_defeated == True:
                 f.write("You won the game!\n")

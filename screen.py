@@ -1,7 +1,9 @@
 import pygame
 import xp
 class Screen:
+    """Klasa odpowiedzialna za wyświetlanie i obsługę ekranu gry."""
     def __init__(self):
+        """Inicjalizuje ekran gry, ładuje grafiki i ustawia podstawowe parametry."""
         self.upgrades = [
         {"name": "Runetracer", "description": "Passes through enemies, bounces around."},
         {"name": "Whip", "description": "Attacks horizontally, passes through enemies."},
@@ -21,10 +23,12 @@ class Screen:
             pygame.image.load("./assets/victory.png"), (self._width, self._height)
         )
     def update(self):
+        """Odświeża ekran gry i ogranicza liczbę klatek na sekundę."""
         pygame.display.flip()
         self.clock.tick(60)
 
     def draw_hud(self, player):
+        """Rysuje pasek HP, XP, poziom i timer na ekranie HUD."""
         font = pygame.font.Font(None, 28)
         offset_x = 50
         offset_y = 40
@@ -53,7 +57,7 @@ class Screen:
         level_text = font.render(f"Level: {player.level}", True, (255, 255, 255))
         self.surface.blit(level_text, (10 + offset_x, 90 + offset_y))
 
-        # Timer
+        # Timer gry
         total_seconds = (pygame.time.get_ticks() - self.start_ticks) // 1000
         minutes = total_seconds // 60
         seconds = total_seconds % 60
@@ -61,9 +65,8 @@ class Screen:
         timer_rect = timer_text.get_rect(center=(self._width // 2, 20 + offset_y))
         self.surface.blit(timer_text, timer_rect)
 
-
-
     def draw_boss_hp_bar(self, boss):
+        """Rysuje pasek HP bossa na dole ekranu."""
         bar_width = 800
         bar_height = 40
         x = (self._width - bar_width) // 2
@@ -76,6 +79,7 @@ class Screen:
         self.surface.blit(hp_text, (x + 20, y + 5))
 
     def show_game_over(self):  
+        """Wyświetla ekran Game Over i odtwarza muzykę końca gry."""
         if not hasattr(self, "_gameover_music_played") or not self._gameover_music_played:
             pygame.mixer.music.load(self.gameover_music_path)
             pygame.mixer.music.play()
@@ -96,7 +100,9 @@ class Screen:
         pygame.display.update()
         # Zerowanie czasu po pokazaniu game over
         self.start_ticks = pygame.time.get_ticks()
+
     def draw_level_up_menu(self, upgrades, selected_idx=None, player=None):
+        """Rysuje menu wyboru ulepszenia po awansie na wyższy poziom."""
         # Pobierz rozmiar ekranu i przygotuj główny box menu
         screen_rect = self.surface.get_rect()
         width = 400
@@ -148,11 +154,13 @@ class Screen:
             self.surface.blit(upgrade_text, upgrade_rect)
 
     def show_victory(self):
+        """Wyświetla ekran zwycięstwa przez 5 sekund."""
         self.surface.blit(self.victory_background, (0, 0))
         pygame.display.update()
         pygame.time.wait(5000)
 
     def draw_start_menu(self):
+        """Wyświetla ekran startowy gry z tytułem i przyciskiem startu."""
         pygame.mixer.music.load(self.menu_music_path)
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0.02)
